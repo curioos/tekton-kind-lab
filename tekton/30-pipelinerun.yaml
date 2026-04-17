@@ -10,7 +10,7 @@ spec:
     serviceAccountName: pipeline-sa
   params:
   - name: repo-url
-    value: https://github.com/REPLACE_WITH_YOUR_USER/devops.git
+    value: https://github.com/curioos/tekton-kind-lab.git
   - name: revision
     value: main
   - name: subdirectory
