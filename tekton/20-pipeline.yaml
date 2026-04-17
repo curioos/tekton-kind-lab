@@ -1,0 +1,64 @@
+apiVersion: tekton.dev/v1
+kind: Pipeline
+metadata:
+  name: python-ci-build
+  namespace: tekton-lab
+spec:
+  params:
+  - name: repo-url
+    type: string
+  - name: revision
+    type: string
+    default: main
+  - name: subdirectory
+    type: string
+    default: app
+  - name: image
+    type: string
+  - name: dockerfile
+    type: string
+    default: Dockerfile
+  - name: context
+    type: string
+    default: .
+  workspaces:
+  - name: shared-workspace
+  tasks:
+  - name: fetch-source
+    taskRef:
+      name: clone-repo
+    params:
+    - name: url
+      value: $(params.repo-url)
+    - name: revision
+      value: $(params.revision)
+    - name: subdirectory
+      value: $(params.subdirectory)
+    workspaces:
+    - name: output
+      workspace: shared-workspace
+
+  - name: run-tests
+    runAfter:
+    - fetch-source
+    taskRef:
+      name: unit-tests
+    workspaces:
+    - name: source
+      workspace: shared-workspace
+
+  - name: build-image
+    runAfter:
+    - run-tests
+    taskRef:
+      name: build-image
+    params:
+    - name: image
+      value: $(params.image)
+    - name: dockerfile
+      value: $(params.dockerfile)
+    - name: context
+      value: $(params.context)
+    workspaces:
+    - name: source
+      workspace: shared-workspace

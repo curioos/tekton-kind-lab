@@ -1,0 +1,27 @@
+apiVersion: tekton.dev/v1
+kind: PipelineRun
+metadata:
+  generateName: python-ci-build-run-
+  namespace: tekton-lab
+spec:
+  pipelineRef:
+    name: python-ci-build
+  taskRunTemplate:
+    serviceAccountName: pipeline-sa
+  params:
+  - name: repo-url
+    value: https://github.com/REPLACE_WITH_YOUR_USER/devops.git
+  - name: revision
+    value: main
+  - name: subdirectory
+    value: k8s/prj-1/app
+  - name: image
+    value: localhost:5001/tekton-lab/python-app:latest
+  - name: dockerfile
+    value: Dockerfile
+  - name: context
+    value: .
+  workspaces:
+  - name: shared-workspace
+    persistentVolumeClaim:
+      claimName: tekton-workspace-pvc
